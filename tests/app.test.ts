@@ -8,9 +8,9 @@ Deno.test(
     const port = 3000;
 
     // Add a route to the app
-    app.get("/", async (ctx) => {
+    app.get("/", (ctx) => {
       ctx.set("Content-Type", "text/plain");
-      return new Response("Hello, world!");
+      return ctx.send("Hello, world!");
     });
 
     // Start the app
@@ -39,9 +39,9 @@ Deno.test(
     const port = 3000;
 
     // Add a route to the app
-    app.post("/", async (ctx) => {
+    app.post("/", (ctx) => {
       ctx.set("Content-Type", "text/plain");
-      return new Response("Data received");
+      return ctx.send("Data received");
     });
 
     // Start the app
@@ -73,9 +73,9 @@ Deno.test(
     const port = 3000;
 
     // Add a route to the app
-    app.get("/", async (ctx) => {
+    app.get("/", (ctx) => {
       ctx.set("Content-Type", "text/plain");
-      return new Response("Hello, world!");
+      return ctx.send("Hello, world!");
     });
 
     // Start the app
@@ -106,9 +106,9 @@ Deno.test(
     const port = 3000;
 
     // Add a route to the app
-    app.get("/", async (ctx) => {
+    app.get("/", (ctx) => {
       ctx.set("Content-Type", "text/plain");
-      return new Response("Hello, world!");
+      return ctx.send("Hello, world!");
     });
 
     // Start the app
@@ -138,22 +138,22 @@ Deno.test(
     const port = 3000;
 
     // Add a route to the app
-    app.use("/", async (ctx) => {
+    app.use("/", (ctx) => {
       ctx.set("Content-Type", "text/plain");
       if (ctx.req.method === "GET") {
         console.log(ctx.req.method);
 
         return ctx.next();
       }
-      return new Response("Hello, world!");
+      return ctx.send("Hello, world!");
     });
 
-    app.get("/", async (ctx) => {
-      return new Response("Hello, Get!");
+    app.get("/", (ctx) => {
+      return ctx.send("Hello, Get!");
     });
 
-    app.post("/", async (ctx) => {
-      return new Response("Hello, Post!");
+    app.post("/", (ctx) => {
+      return ctx.send("Hello, Post!");
     });
 
     // Start the app

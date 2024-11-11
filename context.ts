@@ -43,10 +43,10 @@ export class Ctx implements Context {
     };
     const response = new Response(body, init);
     // Set additional properties on the response object
-    Object.defineProperty(response, 'ok', { value: this.ok });
-    Object.defineProperty(response, 'redirected', { value: this.redirected });
-    Object.defineProperty(response, 'type', { value: this.type });
-    Object.defineProperty(response, 'url', { value: this.url });
+    Object.defineProperty(response, "ok", { value: this.ok });
+    Object.defineProperty(response, "redirected", { value: this.redirected });
+    Object.defineProperty(response, "type", { value: this.type });
+    Object.defineProperty(response, "url", { value: this.url });
     return response;
   }
 
