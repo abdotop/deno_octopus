@@ -1,5 +1,5 @@
-import { App as app } from "./types/app";
-import { Ctx } from "./context";
+import { App as app } from "./types/app.ts";
+import { Ctx } from "./context.ts";
 import type {
   Config,
   Error,

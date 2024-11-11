@@ -1,4 +1,4 @@
-import { App } from "./app";
-import { Ctx } from "./context";
+import { App } from "./app.ts";
+import { Ctx } from "./context.ts";
 
 export { App, Ctx };

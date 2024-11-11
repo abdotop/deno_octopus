@@ -1,5 +1,5 @@
-import type { HandlerFunc } from "./types/types";
-import type { Context } from "./types/context";
+import type { HandlerFunc } from "./types/types.ts";
+import type { Context } from "./types/context.ts";
 
 export class Ctx implements Context {
   req: Request;
@@ -77,10 +77,11 @@ export class Ctx implements Context {
     this._headers.delete(name);
   }
   get(name: string): string | null {
-    return this._headers.get(name);
+
+    return this.req.headers.get(name);
   }
   has(name: string): boolean {
-    return this._headers.has(name);
+    return this.req.headers.has(name);
   }
   set(name: string, value: string): void {
     this._headers.set(name, value);

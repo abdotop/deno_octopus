@@ -1,4 +1,4 @@
-import type { Config, HandlerFunc } from "./types";
+import type { Config, HandlerFunc } from "./types.ts";
 
 export abstract class App {
   abstract run(cfg: Config): void;
