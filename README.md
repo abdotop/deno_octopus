@@ -75,17 +75,9 @@ and response lifecycle.
 
 - `req: Request:` The incoming request object.
 
-- `ok: boolean:` Indicates if the response is successful.
-
-- `redirected: boolean:` Indicates if the response is a redirection.
-
 - `status: number:` The HTTP status code of the response.
 
 - `statusText: string:` The status text of the response.
-
-- `type: ResponseType:` The type of the response.
-
-- `url: string:` The URL of the request.
 
 ### Methods
 

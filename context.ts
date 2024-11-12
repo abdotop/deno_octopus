@@ -1,53 +1,39 @@
-import type { HandlerFunc } from "./types/types.ts";
-import type { Context } from "./types/context.ts";
+import { type HandlerFunc, type Context, ServerError } from "./types/types.ts";
 
 export class Ctx implements Context {
   req: Request;
-  ok: boolean;
-  redirected: boolean;
   status: number;
   statusText: string;
-  type: ResponseType;
-  url: string;
   private handlers: HandlerFunc[] = [];
   private currentHandlerIndex: number = 0;
   private _headers: Headers;
   private _body: BodyInit | null = null;
   private _bodyUsed: boolean = false;
+  private _socket_response: Response | null;
 
   constructor(req: Request, headers: Headers, handlers?: HandlerFunc[]) {
     this.req = req;
     this._headers = headers;
-    this.ok = true;
-    this.redirected = false;
     this.status = 200;
     this.statusText = "OK";
-    this.type = "basic";
-    this.url = req.url;
+    this._socket_response = null;
     if (handlers) {
       this.handlers = handlers;
     }
   }
 
-  get bodyUsed(): boolean {
-    return this._bodyUsed;
-  }
-
   clone(): Response {
     const headers = new Headers(this._headers);
-    const body = this.bodyUsed ? this._body : null;
+    const body = this._bodyUsed ? this._body : null;
     const init: ResponseInit = {
       status: this.status,
       statusText: this.statusText,
       headers: headers,
     };
-    const response = new Response(body, init);
-    // Set additional properties on the response object
-    Object.defineProperty(response, "ok", { value: this.ok });
-    Object.defineProperty(response, "redirected", { value: this.redirected });
-    Object.defineProperty(response, "type", { value: this.type });
-    Object.defineProperty(response, "url", { value: this.url });
-    return response;
+    if (this._socket_response) {
+      return this._socket_response;
+    }
+    return new Response(body, init);
   }
 
   async next(): Promise<void> {
@@ -67,6 +53,15 @@ export class Ctx implements Context {
   json(data: unknown, status: number = 200): void {
     this._headers.set("Content-Type", "application/json");
     this.send(JSON.stringify(data), status);
+  }
+
+  to_socket(opts?: Deno.UpgradeWebSocketOptions): WebSocket {
+    if (this.req.headers.get("upgrade") !== "websocket") {
+      throw new ServerError("Request is not a WebSocket upgrade", 400);
+    }
+    const { socket, response } = Deno.upgradeWebSocket(this.req, opts);
+    this._socket_response = response;
+    return socket;
   }
 
   // Headers methods

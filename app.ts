@@ -1,12 +1,11 @@
-import { App as app } from "./types/app.ts";
 import { Ctx } from "./context.ts";
-import type {
+import {
+  App as app,
   Config,
-  Error,
+  ServerError,
   HandlerFunc,
-  Methode,
   Routes,
-} from "./types/types";
+} from "./types/types.ts";
 
 export class App extends app {
   #router: Routes;
@@ -24,29 +23,28 @@ export class App extends app {
       const path = new URL(url).pathname;
       const route = this.#router.get(path);
       if (!route) {
-        throw { code: 404, message: "Not found" };
+        throw new ServerError("Not found", 404);
       }
-
-      const handlers = route.get(method as Methode);
+      const handlers = route.get(method);
       if (!handlers) {
-        throw { code: 405, message: "Method not allowed" };
+        throw new ServerError("Method not allowed", 405);
       }
       const ctx = new Ctx(req, new Headers(), handlers);
       await ctx.next();
       return ctx.clone();
-    } catch (error: Error) {
-      const res = new Response(error.message, { status: error.code });
-      return res;
+    } catch (error: unknown) {
+      if (error instanceof ServerError) {
+        return new Response(error.message, { status: error.statusCode });
+      } else if (error instanceof Error) {
+        return new Response(error.message, { status: 500 });
+      } else {
+        return new Response("Internal Server Error", { status: 500 });
+      }
     }
   };
 
   run(cfg: Config): void {
-    const handler = (req: Request) => {
-      return this.#ServeHTTP(req);
-    };
-
-    // To listen on the specified port and bind to 0.0.0.0.
-    Deno.serve({ ...cfg, signal: this.controller.signal }, handler);
+    Deno.serve({ ...cfg, signal: this.controller.signal }, this.#ServeHTTP);
   }
 
   close(): void {
@@ -59,7 +57,7 @@ export class App extends app {
 
   get(path: string, ...handlers: HandlerFunc[]): void {
     const route = this.#router.get(path) || new Map();
-    const _handlers = this.#middleware.get(path)?.get("USE" as Methode);
+    const _handlers = this.#middleware.get(path)?.get("USE");
     if (_handlers) {
       handlers = [..._handlers, ...handlers];
     }
@@ -69,7 +67,7 @@ export class App extends app {
 
   post(path: string, ...handlers: HandlerFunc[]): void {
     const route = this.#router.get(path) || new Map();
-    const _handlers = this.#middleware.get(path)?.get("USE" as Methode);
+    const _handlers = this.#middleware.get(path)?.get("USE");
     if (_handlers) {
       handlers = [..._handlers, ...handlers];
     }
@@ -79,7 +77,7 @@ export class App extends app {
 
   put(path: string, ...handlers: HandlerFunc[]): void {
     const route = this.#router.get(path) || new Map();
-    const _handlers = this.#middleware.get(path)?.get("USE" as Methode);
+    const _handlers = this.#middleware.get(path)?.get("USE");
     if (_handlers) {
       handlers = [..._handlers, ...handlers];
     }
@@ -89,7 +87,7 @@ export class App extends app {
 
   delete(path: string, ...handlers: HandlerFunc[]): void {
     const route = this.#router.get(path) || new Map();
-    const _handlers = this.#middleware.get(path)?.get("USE" as Methode);
+    const _handlers = this.#middleware.get(path)?.get("USE");
     if (_handlers) {
       handlers = [..._handlers, ...handlers];
     }

@@ -1,5 +1,6 @@
 import { assertEquals } from "jsr:@std/assert";
-import { App } from "../index"; // Adjust the import path as necessary
+import { App } from "../index.ts";
+import { Context } from "../types/types.ts";
 
 Deno.test(
   "App should respond with 'Hello, world!' for GET requests",
@@ -8,7 +9,7 @@ Deno.test(
     const port = 3000;
 
     // Add a route to the app
-    app.get("/", (ctx) => {
+    app.get("/", (ctx: Context) => {
       ctx.set("Content-Type", "text/plain");
       return ctx.send("Hello, world!");
     });
@@ -24,12 +25,14 @@ Deno.test(
     const text = await response.text();
 
     // Check the response
+    console.log(response.statusText,response.status,response.body);
+    
     assertEquals(response.status, 200);
     assertEquals(text, "Hello, world!");
 
     // Stop the server
     app.close();
-  },
+  }
 );
 
 Deno.test(
@@ -39,7 +42,7 @@ Deno.test(
     const port = 3000;
 
     // Add a route to the app
-    app.post("/", (ctx) => {
+    app.post("/", (ctx: Context) => {
       ctx.set("Content-Type", "text/plain");
       return ctx.send("Data received");
     });
@@ -63,7 +66,7 @@ Deno.test(
 
     // Stop the server
     app.close();
-  },
+  }
 );
 
 Deno.test(
@@ -73,7 +76,7 @@ Deno.test(
     const port = 3000;
 
     // Add a route to the app
-    app.get("/", (ctx) => {
+    app.get("/", (ctx: Context) => {
       ctx.set("Content-Type", "text/plain");
       return ctx.send("Hello, world!");
     });
@@ -96,7 +99,7 @@ Deno.test(
 
     // Stop the server
     app.close();
-  },
+  }
 );
 
 Deno.test(
@@ -106,7 +109,7 @@ Deno.test(
     const port = 3000;
 
     // Add a route to the app
-    app.get("/", (ctx) => {
+    app.get("/", (ctx: Context) => {
       ctx.set("Content-Type", "text/plain");
       return ctx.send("Hello, world!");
     });
@@ -127,18 +130,18 @@ Deno.test(
 
     // Stop the server
     app.close();
-  },
+  }
 );
 
 //   test the use method
 Deno.test(
-  "App should respond with 'Hello, world!' for GET requests with the use method",
+  "App should respond with 'Hello, Get!' for GET requests with the use method",
   async () => {
     const app = new App();
     const port = 3000;
 
     // Add a route to the app
-    app.use("/", (ctx) => {
+    app.use("/", (ctx: Context) => {
       ctx.set("Content-Type", "text/plain");
       if (ctx.req.method === "GET") {
         console.log(ctx.req.method);
@@ -148,11 +151,11 @@ Deno.test(
       return ctx.send("Hello, world!");
     });
 
-    app.get("/", (ctx) => {
+    app.get("/", (ctx: Context) => {
       return ctx.send("Hello, Get!");
     });
 
-    app.post("/", (ctx) => {
+    app.post("/", (ctx: Context) => {
       return ctx.send("Hello, Post!");
     });
 
@@ -182,5 +185,5 @@ Deno.test(
 
     // Stop the server
     app.close();
-  },
+  }
 );
